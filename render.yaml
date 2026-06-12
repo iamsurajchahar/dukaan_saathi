@@ -3,11 +3,13 @@ services:
     name: dukaan-saathi-api
     runtime: node
     plan: free
-    buildCommand: corepack enable && pnpm install --frozen-lockfile && pnpm build:server
+    buildCommand: npm install -g pnpm@9 && pnpm install --frozen-lockfile && pnpm build:server
     startCommand: node apps/server/dist/index.js
     healthCheckPath: /api/health
     autoDeploy: true
     envVars:
+      - key: NODE_VERSION
+        value: "22"
       - key: NODE_ENV
         value: production
       - key: JWT_ACCESS_SECRET
