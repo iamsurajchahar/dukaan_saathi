@@ -6,6 +6,7 @@ import { useStore } from '@/providers/store-provider';
 import { useLanguage } from '@/providers/language-provider';
 import PageHeader from '@/components/ui/page-header';
 import apiClient from '@/lib/api-client';
+import { getApiErrorMessage } from '@/lib/utils';
 import toast from 'react-hot-toast';
 
 export default function StoresPage() {
@@ -77,7 +78,7 @@ function CreateStoreModal({ onClose }: { onClose: () => void }) {
       toast.success(t.stores.created);
       onClose();
     } catch (err: any) {
-      toast.error(err.response?.data?.error || t.stores.createFailed);
+      toast.error(getApiErrorMessage(err, t.stores.createFailed));
     } finally {
       setIsLoading(false);
     }

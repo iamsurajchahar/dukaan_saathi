@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Search, X, ShoppingCart } from 'lucide-react';
 import apiClient from '@/lib/api-client';
-import { formatCurrency, formatDate } from '@/lib/utils';
+import { formatCurrency, formatDate, getApiErrorMessage } from '@/lib/utils';
 import { useLanguage } from '@/providers/language-provider';
 import PageHeader from '@/components/ui/page-header';
 import ConfirmDialog from '@/components/ui/confirm-dialog';
@@ -57,7 +57,7 @@ export default function SalesPage() {
       queryClient.invalidateQueries({ queryKey: ['low-stock'] });
       toast.success(t.sales.saleRecorded);
     },
-    onError: (err: any) => toast.error(err.response?.data?.error || t.sales.saleFailed),
+    onError: (err: any) => toast.error(getApiErrorMessage(err, t.sales.saleFailed)),
   });
 
   const addToCart = (product: any) => {

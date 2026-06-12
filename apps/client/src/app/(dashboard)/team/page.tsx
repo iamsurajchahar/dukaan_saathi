@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { UserPlus, Trash2 } from 'lucide-react';
 import apiClient from '@/lib/api-client';
+import { getApiErrorMessage } from '@/lib/utils';
 import { useLanguage } from '@/providers/language-provider';
 import PageHeader from '@/components/ui/page-header';
 import ConfirmDialog from '@/components/ui/confirm-dialog';
@@ -33,7 +34,7 @@ export default function TeamPage() {
       setInviteEmail('');
       toast.success(t.team.invited);
     },
-    onError: (err: any) => toast.error(err.response?.data?.error || t.team.inviteFailed),
+    onError: (err: any) => toast.error(getApiErrorMessage(err, t.team.inviteFailed)),
   });
 
   const removeMutation = useMutation({

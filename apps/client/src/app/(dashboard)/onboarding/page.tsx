@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Store, MapPin, Phone, ChevronRight, ChevronLeft, Sparkles, Package, TrendingUp, Bell, ShoppingCart } from 'lucide-react';
 import apiClient from '@/lib/api-client';
+import { getApiErrorMessage } from '@/lib/utils';
 import { useAuth } from '@/providers/auth-provider';
 import { useLanguage } from '@/providers/language-provider';
 import VoiceButton from '@/components/ui/voice-button';
@@ -34,7 +35,7 @@ export default function OnboardingPage() {
       toast.success(t.onboarding.storeCreated);
       router.push('/dashboard');
     } catch (err: any) {
-      toast.error(err.response?.data?.error || t.onboarding.createFailed);
+      toast.error(getApiErrorMessage(err, t.onboarding.createFailed));
     } finally {
       setIsLoading(false);
     }

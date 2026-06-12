@@ -6,6 +6,7 @@ import { Mail, Lock, LogIn } from 'lucide-react';
 import { useAuth } from '@/providers/auth-provider';
 import { useLanguage } from '@/providers/language-provider';
 import VoiceButton from '@/components/ui/voice-button';
+import { getApiErrorMessage } from '@/lib/utils';
 import toast from 'react-hot-toast';
 
 export default function LoginPage() {
@@ -22,7 +23,7 @@ export default function LoginPage() {
       await login(email, password);
       toast.success(t.loginSuccess);
     } catch (err: any) {
-      toast.error(err.response?.data?.error || t.loginFailed);
+      toast.error(getApiErrorMessage(err, t.loginFailed));
     } finally {
       setIsLoading(false);
     }

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useDropzone } from 'react-dropzone';
 import { Upload, FileText, CheckCircle, AlertCircle } from 'lucide-react';
 import apiClient from '@/lib/api-client';
+import { getApiErrorMessage } from '@/lib/utils';
 import { useLanguage } from '@/providers/language-provider';
 import PageHeader from '@/components/ui/page-header';
 import toast from 'react-hot-toast';
@@ -39,7 +40,7 @@ export default function ImportPage() {
       setResult(data.data);
       toast.success(`${data.data.imported} ${t.inventory.imported}!`);
     } catch (err: any) {
-      toast.error(err.response?.data?.error || t.error);
+      toast.error(getApiErrorMessage(err, t.error));
     } finally {
       setIsUploading(false);
     }

@@ -6,6 +6,7 @@ import { User, Mail, Lock, UserPlus } from 'lucide-react';
 import { useAuth } from '@/providers/auth-provider';
 import { useLanguage } from '@/providers/language-provider';
 import VoiceButton from '@/components/ui/voice-button';
+import { getApiErrorMessage } from '@/lib/utils';
 import toast from 'react-hot-toast';
 
 export default function RegisterPage() {
@@ -21,7 +22,7 @@ export default function RegisterPage() {
       await register(form);
       toast.success(t.registerSuccess);
     } catch (err: any) {
-      toast.error(err.response?.data?.error || t.registerFailed);
+      toast.error(getApiErrorMessage(err, t.registerFailed));
     } finally {
       setIsLoading(false);
     }

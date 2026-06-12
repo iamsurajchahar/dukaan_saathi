@@ -24,3 +24,12 @@ export function formatDate(date: string | Date) {
 export function formatNumber(num: number) {
   return new Intl.NumberFormat('en-IN').format(num);
 }
+
+// API errors normally carry a string in data.error, but proxy/platform errors
+// (Vercel, Render) can return objects — never pass those to toast/JSX
+export function getApiErrorMessage(err: any, fallback: string): string {
+  const apiError = err?.response?.data?.error;
+  if (typeof apiError === 'string' && apiError.trim()) return apiError;
+  if (typeof apiError?.message === 'string') return apiError.message;
+  return fallback;
+}

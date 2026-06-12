@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Plus, Upload, Download, Search, Trash2, Edit2 } from 'lucide-react';
 import apiClient from '@/lib/api-client';
-import { formatCurrency } from '@/lib/utils';
+import { formatCurrency, getApiErrorMessage } from '@/lib/utils';
 import { useLanguage } from '@/providers/language-provider';
 import PageHeader from '@/components/ui/page-header';
 import HelpTooltip from '@/components/ui/help-tooltip';
@@ -181,7 +181,7 @@ function ProductModal({ product, onClose }: { product: any; onClose: () => void 
       queryClient.invalidateQueries({ queryKey: ['products'] });
       onClose();
     } catch (err: any) {
-      toast.error(err.response?.data?.error || t.inventory.saveFailed);
+      toast.error(getApiErrorMessage(err, t.inventory.saveFailed));
     } finally {
       setIsLoading(false);
     }

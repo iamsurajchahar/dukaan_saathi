@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Lock, CheckCircle } from 'lucide-react';
 import { useLanguage } from '@/providers/language-provider';
+import { getApiErrorMessage } from '@/lib/utils';
 import apiClient from '@/lib/api-client';
 import toast from 'react-hot-toast';
 
@@ -32,7 +33,7 @@ function ResetPasswordForm() {
       toast.success(t.success);
       setTimeout(() => router.push('/login'), 2000);
     } catch (err: any) {
-      toast.error(err?.response?.data?.error || t.error);
+      toast.error(getApiErrorMessage(err, t.error));
     } finally {
       setIsLoading(false);
     }
