@@ -1,0 +1,37 @@
+{
+  "name": "@stocksense/client",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --turbo",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@stocksense/shared-types": "workspace:*",
+    "next": "^14.2.0",
+    "react": "^18.3.0",
+    "react-dom": "^18.3.0",
+    "@tanstack/react-query": "^5.56.0",
+    "axios": "^1.7.7",
+    "recharts": "^2.12.0",
+    "framer-motion": "^11.5.0",
+    "react-hot-toast": "^2.4.1",
+    "react-dropzone": "^14.2.3",
+    "date-fns": "^3.6.0",
+    "lucide-react": "^0.441.0",
+    "clsx": "^2.1.1",
+    "tailwind-merge": "^2.5.2"
+  },
+  "devDependencies": {
+    "@stocksense/tsconfig": "workspace:*",
+    "@types/node": "^20.16.0",
+    "@types/react": "^18.3.0",
+    "@types/react-dom": "^18.3.0",
+    "typescript": "^5.6.0",
+    "tailwindcss": "^3.4.0",
+    "postcss": "^8.4.45",
+    "autoprefixer": "^10.4.20"
+  }
+}
