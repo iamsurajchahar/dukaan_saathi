@@ -3,7 +3,7 @@ services:
     name: dukaan-saathi-api
     runtime: node
     plan: free
-    buildCommand: npm install -g pnpm@9 && pnpm install --frozen-lockfile && pnpm build:server
+    buildCommand: npm install -g pnpm@9 && pnpm install --frozen-lockfile --prod=false && pnpm build:server
     startCommand: node apps/server/dist/index.js
     healthCheckPath: /api/health
     autoDeploy: true
