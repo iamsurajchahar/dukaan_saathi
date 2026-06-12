@@ -11,6 +11,7 @@ import {
 import {
   sendVerificationEmail,
   sendResetPasswordEmail,
+  sendWelcomeEmail,
 } from './email.service';
 import { PLAN_LIMITS } from '@stocksense/shared-types';
 
@@ -77,10 +78,17 @@ export const authService = {
       throw new UnauthorizedError('Invalid email or password');
     }
 
+    const isFirstLogin = !user.lastLoginAt;
+
     const tokens = generateTokens(String(user._id));
     user.refreshToken = tokens.refreshToken;
     user.lastLoginAt = new Date();
     await user.save();
+
+    if (isFirstLogin) {
+      // Fire-and-forget so the welcome email never slows down login
+      void sendWelcomeEmail(user.email, user.firstName);
+    }
 
     return { user: user.toJSON(), ...tokens };
   },
