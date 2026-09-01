@@ -48,7 +48,9 @@ export const authService = {
     const emailVerificationToken = crypto.randomBytes(32).toString('hex');
     const emailVerificationExpires = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
 
-    const user = await User.create({
+    // Mongoose assigns _id up front, so the refresh token can go in before the
+    // first write instead of costing a second round trip to the database.
+    const user = new User({
       email: data.email,
       passwordHash: data.password,
       firstName: data.firstName,
@@ -60,9 +62,20 @@ export const authService = {
 
     const tokens = generateTokens(String(user._id));
     user.refreshToken = tokens.refreshToken;
-    await user.save();
 
-    await sendVerificationEmail(data.email, emailVerificationToken);
+    try {
+      await user.save();
+    } catch (err) {
+      // The unique index is the real guard; the findOne above can still lose a
+      // race between two concurrent signups with the same address.
+      if ((err as { code?: number }).code === 11000) {
+        throw new ConflictError('Email already registered');
+      }
+      throw err;
+    }
+
+    // Fire-and-forget so a slow or unconfigured mail host never holds up signup
+    void sendVerificationEmail(data.email, emailVerificationToken);
 
     return { user: user.toJSON(), ...tokens };
   },
@@ -159,7 +172,7 @@ export const authService = {
     user.resetPasswordExpires = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
     await user.save();
 
-    await sendResetPasswordEmail(email, resetToken);
+    void sendResetPasswordEmail(email, resetToken);
 
     return { message: 'If the email exists, a reset link has been sent' };
   },

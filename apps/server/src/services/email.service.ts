@@ -2,6 +2,8 @@ import nodemailer from 'nodemailer';
 import { config } from '../config';
 import { logger } from '../config/logger';
 
+const isConfigured = Boolean(config.smtp.host && config.smtp.user && config.smtp.pass);
+
 const transporter = nodemailer.createTransport({
   host: config.smtp.host,
   port: config.smtp.port,
@@ -10,7 +12,18 @@ const transporter = nodemailer.createTransport({
     user: config.smtp.user,
     pass: config.smtp.pass,
   },
+  // Without these, an unreachable SMTP host holds the socket open for the OS
+  // default (~2 min) and drags every request that sends mail along with it.
+  connectionTimeout: 5000,
+  greetingTimeout: 5000,
+  socketTimeout: 10000,
+  pool: true,
+  maxConnections: 3,
 });
+
+if (!isConfigured) {
+  logger.warn('SMTP is not configured (SMTP_PASS is empty) — emails will be skipped');
+}
 
 interface EmailOptions {
   to: string;
@@ -19,6 +32,12 @@ interface EmailOptions {
 }
 
 export const sendEmail = async (options: EmailOptions): Promise<void> => {
+  // Skip the round trip entirely when there are no credentials — otherwise
+  // every send burns seconds only to fail authentication.
+  if (!isConfigured) {
+    logger.info(`Email to ${options.to} skipped: SMTP not configured`);
+    return;
+  }
   try {
     await transporter.sendMail({
       from: config.smtp.from,
