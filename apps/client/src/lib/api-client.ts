@@ -3,6 +3,10 @@ import axios from 'axios';
 const apiClient = axios.create({
   baseURL: '/api/v1',
   headers: { 'Content-Type': 'application/json' },
+  // Without a ceiling a stalled request leaves the caller awaiting forever, so
+  // buttons sit on their loading label and no error is ever surfaced. Generous
+  // enough to survive a cold start on a sleeping free-tier backend.
+  timeout: 60000,
 });
 
 // Request interceptor: attach auth token and store ID
