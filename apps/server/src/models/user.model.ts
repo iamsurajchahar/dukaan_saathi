@@ -1,5 +1,6 @@
 import mongoose, { Document, Schema } from 'mongoose';
 import bcrypt from 'bcryptjs';
+import { config } from '../config';
 
 export interface IUserDocument extends Document {
   email: string;
@@ -65,7 +66,7 @@ userSchema.index({ 'stores.storeId': 1 });
 
 userSchema.pre('save', async function (next) {
   if (!this.isModified('passwordHash')) return next();
-  const salt = await bcrypt.genSalt(12);
+  const salt = await bcrypt.genSalt(config.bcryptRounds);
   this.passwordHash = await bcrypt.hash(this.passwordHash, salt);
   next();
 });

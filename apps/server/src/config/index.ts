@@ -14,6 +14,12 @@ export const config = {
     uri: process.env.MONGODB_URI || 'mongodb://localhost:27017/stocksense',
   },
 
+  // Cost factor for password hashing. 10 is the OWASP floor and hashes in
+  // roughly a quarter the time of 12, which dominates signup on a small
+  // instance. Raise it here if the host has CPU to spare; bcrypt records the
+  // cost inside each hash, so existing passwords keep verifying either way.
+  bcryptRounds: parseInt(process.env.BCRYPT_ROUNDS || '10', 10),
+
   jwt: {
     accessSecret: process.env.JWT_ACCESS_SECRET || 'dev-access-secret',
     refreshSecret: process.env.JWT_REFRESH_SECRET || 'dev-refresh-secret',
