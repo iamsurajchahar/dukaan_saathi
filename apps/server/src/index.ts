@@ -1,5 +1,11 @@
 import dns from 'dns';
-dns.setServers(['8.8.8.8', '8.8.4.4']);
+
+// Local networks often can't resolve MongoDB Atlas SRV records; Google's
+// resolvers work around that in dev. Never override DNS on a hosting platform
+// (Render/Railway) — it relies on its own resolver for internal traffic.
+if (process.env.NODE_ENV !== 'production') {
+  dns.setServers(['8.8.8.8', '8.8.4.4']);
+}
 
 import mongoose from 'mongoose';
 import app from './app';
@@ -10,15 +16,17 @@ import { startForecastRefreshJob } from './jobs/forecast-refresh.job';
 import { startAlertCheckJob } from './jobs/alert-check.job';
 
 const start = async () => {
+  // Bind the port before the DB handshake. Render health-checks the port and
+  // fails the deploy if nothing is listening while Mongo is still connecting.
+  const server = app.listen(config.port, '0.0.0.0', () => {
+    logger.info(`Server running on port ${config.port} in ${config.nodeEnv} mode`);
+  });
+
   await connectDB();
 
   startForecastRefreshJob();
   startAlertCheckJob();
   logger.info('Background jobs scheduled (forecast refresh, low-stock alerts)');
-
-  const server = app.listen(config.port, () => {
-    logger.info(`Server running on port ${config.port} in ${config.nodeEnv} mode`);
-  });
 
   const shutdown = (signal: string) => {
     logger.info(`${signal} received, shutting down gracefully...`);

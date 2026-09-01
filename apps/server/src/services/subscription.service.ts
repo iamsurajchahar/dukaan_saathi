@@ -5,10 +5,25 @@ import { Subscription } from '../models/subscription.model';
 import { PLAN_LIMITS, PlanType } from '@stocksense/shared-types';
 import { BadRequestError, NotFoundError } from '../utils/errors';
 
-const razorpay = new Razorpay({
-  key_id: config.razorpay.keyId,
-  key_secret: config.razorpay.keySecret,
-});
+// Built lazily: the SDK throws when key_id is missing, and payment credentials
+// are optional for deployments that don't sell plans yet. Constructing this at
+// import time takes the whole server down on boot.
+let razorpayClient: Razorpay | null = null;
+
+const getRazorpay = (): Razorpay => {
+  if (!config.razorpay.keyId || !config.razorpay.keySecret) {
+    throw new BadRequestError(
+      'Payments are not configured on this server. Set RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET.'
+    );
+  }
+  if (!razorpayClient) {
+    razorpayClient = new Razorpay({
+      key_id: config.razorpay.keyId,
+      key_secret: config.razorpay.keySecret,
+    });
+  }
+  return razorpayClient;
+};
 
 const PLAN_PRICES: Record<string, number> = {
   pro: 99900, // ₹999 in paise
@@ -37,7 +52,7 @@ export const subscriptionService = {
       throw new BadRequestError('Invalid plan');
     }
 
-    const order = await razorpay.orders.create({
+    const order = await getRazorpay().orders.create({
       amount: price,
       currency: 'INR',
       receipt: `sub_${Date.now()}`,
